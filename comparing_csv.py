@@ -25,6 +25,7 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
 
         # Add a "Matched Data" tab if merged_df is not empty
         if not merged_df.empty:
+            # Write all the columns (ID columns + other columns from both files) to a "Matched Data" sheet
             merged_columns = merged_df[[id_column1, id_column2] + 
                                        [f'{col}_file1' for col in df1.columns if col != id_column1] +
                                        [f'{col}_file2' for col in df2.columns if col != id_column2]]
@@ -33,7 +34,8 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
 
         # Iterate over the columns present in both files, excluding the ID columns
         for column in df1.columns:
-            if column != id_column1 and column in df2.columns:
+            # Ensure we do not compare the ID column (id_column1 or id_column2)
+            if column != id_column1 and column in df2.columns and column != id_column2:
                 # Compare the two dataframes for the current column
                 col_file1 = f'{column}_file1'
                 col_file2 = f'{column}_file2'
