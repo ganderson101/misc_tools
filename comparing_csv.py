@@ -9,11 +9,24 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
     if id_column1 not in df1.columns or id_column2 not in df2.columns:
         raise ValueError(f"File1 must contain '{id_column1}' and File2 must contain '{id_column2}'.")
 
+    # Handle NaN values in ID columns
+    df1_with_nan = df1[df1[id_column1].isna()]
+    df2_with_nan = df2[df2[id_column2].isna()]
+    
+    df1 = df1.dropna(subset=[id_column1])
+    df2 = df2.dropna(subset=[id_column2])
+
     # Merge the dataframes on the two different ID columns (myID1 and myID2)
     merged_df = pd.merge(df1, df2, left_on=id_column1, right_on=id_column2, suffixes=('_file1', '_file2'))
-    
+
     # Create a writer object for Excel output
     with pd.ExcelWriter(output_excel, engine='openpyxl') as writer:
+        # Add a "Matched Data" tab
+        merged_columns = merged_df[[id_column1, id_column2] + 
+                                   [f'{col}_file1' for col in df1.columns if col != id_column1] +
+                                   [f'{col}_file2' for col in df2.columns if col != id_column2]]
+        merged_columns.to_excel(writer, sheet_name='Matched_Data', index=False)
+
         # Iterate over the columns present in both files, excluding the ID columns
         for column in df1.columns:
             if column != id_column1 and column in df2.columns:
@@ -33,8 +46,11 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
                 # Write to an Excel sheet if there are differences
                 if not diffs.empty:
                     diffs.to_excel(writer, sheet_name=column, index=False)
+        
+        # Write rows with NaN in the ID columns to separate tabs
+        if not df1_with_nan.empty:
+            df1_with_nan.to_excel(writer, sheet_name=f'{id_column1}_NaN', index=False)
+        if not df2_with_nan.empty:
+            df2_with_nan.to_excel(writer, sheet_name=f'{id_column2}_NaN', index=False)
 
     print(f"Comparison complete! Differences saved to {output_excel}")
-
-# Example usage
-# compare_csvs('file1.csv', 'file2.csv', 'myID1', 'myID2', 'comparison_output.xlsx')
