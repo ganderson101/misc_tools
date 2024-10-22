@@ -1,15 +1,15 @@
 import pandas as pd
 
 def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
-    # Load the two CSV files
-    df1 = pd.read_csv(file1)
-    df2 = pd.read_csv(file2)
+    # Load the two CSV files, forcing all columns to be strings
+    df1 = pd.read_csv(file1, dtype=str)
+    df2 = pd.read_csv(file2, dtype=str)
     
     # Ensure that both dataframes have the ID columns
     if id_column1 not in df1.columns or id_column2 not in df2.columns:
         raise ValueError(f"File1 must contain '{id_column1}' and File2 must contain '{id_column2}'.")
 
-    # Handle NaN values in ID columns
+    # Handle NaN values in ID columns (which are now read as strings, so we check for 'NaN')
     df1_with_nan = df1[df1[id_column1].isna()]
     df2_with_nan = df2[df2[id_column2].isna()]
     
@@ -65,3 +65,6 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
             pd.DataFrame({'Message': ['No data to compare or no differences found.']}).to_excel(writer, sheet_name='No_Differences', index=False)
 
     print(f"Comparison complete! Differences saved to {output_excel}")
+
+# Example usage
+# compare_csvs('file1.csv', 'file2.csv', 'myID1', 'myID2', 'comparison_output.xlsx')
