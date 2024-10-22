@@ -21,11 +21,15 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
 
     # Create a writer object for Excel output
     with pd.ExcelWriter(output_excel, engine='openpyxl') as writer:
-        # Add a "Matched Data" tab
-        merged_columns = merged_df[[id_column1, id_column2] + 
-                                   [f'{col}_file1' for col in df1.columns if col != id_column1] +
-                                   [f'{col}_file2' for col in df2.columns if col != id_column2]]
-        merged_columns.to_excel(writer, sheet_name='Matched_Data', index=False)
+        sheets_written = False  # Flag to ensure we write at least one sheet
+
+        # Add a "Matched Data" tab if merged_df is not empty
+        if not merged_df.empty:
+            merged_columns = merged_df[[id_column1, id_column2] + 
+                                       [f'{col}_file1' for col in df1.columns if col != id_column1] +
+                                       [f'{col}_file2' for col in df2.columns if col != id_column2]]
+            merged_columns.to_excel(writer, sheet_name='Matched_Data', index=False)
+            sheets_written = True
 
         # Iterate over the columns present in both files, excluding the ID columns
         for column in df1.columns:
@@ -46,11 +50,18 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
                 # Write to an Excel sheet if there are differences
                 if not diffs.empty:
                     diffs.to_excel(writer, sheet_name=column, index=False)
+                    sheets_written = True
         
-        # Write rows with NaN in the ID columns to separate tabs
+        # Write rows with NaN in the ID columns to separate tabs if they exist
         if not df1_with_nan.empty:
             df1_with_nan.to_excel(writer, sheet_name=f'{id_column1}_NaN', index=False)
+            sheets_written = True
         if not df2_with_nan.empty:
             df2_with_nan.to_excel(writer, sheet_name=f'{id_column2}_NaN', index=False)
+            sheets_written = True
+
+        # If no sheets were written, create a default empty sheet with a message
+        if not sheets_written:
+            pd.DataFrame({'Message': ['No data to compare or no differences found.']}).to_excel(writer, sheet_name='No_Differences', index=False)
 
     print(f"Comparison complete! Differences saved to {output_excel}")
