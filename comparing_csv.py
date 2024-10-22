@@ -4,16 +4,14 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
     # Load the two CSV files, forcing all columns to be strings
     df1 = pd.read_csv(file1, dtype=str)
     df2 = pd.read_csv(file2, dtype=str)
-    
-    # Ensure that both dataframes have the ID columns
-    if id_column1 not in df1.columns or id_column2 not in df2.columns:
-        raise ValueError(f"File1 must contain '{id_column1}' and File2 must contain '{id_column2}'.")
 
-    # Handle NaN values in ID columns
-    df1_with_nan = df1[df1[id_column1].isna()]
-    df2_with_nan = df2[df2[id_column2].isna()]
-    
-    # Remove NaN values for the comparison
+    # Ensure that both dataframes have the ID columns
+    if id_column1 not in df1.columns:
+        raise KeyError(f"File1 must contain the ID column: '{id_column1}'")
+    if id_column2 not in df2.columns:
+        raise KeyError(f"File2 must contain the ID column: '{id_column2}'")
+
+    # Handle NaN values in ID columns (but we will not create separate tabs for these)
     df1 = df1.dropna(subset=[id_column1])
     df2 = df2.dropna(subset=[id_column2])
 
@@ -57,14 +55,6 @@ def compare_csvs(file1, file2, id_column1, id_column2, output_excel):
                 if not diffs.empty:
                     diffs.to_excel(writer, sheet_name=column, index=False)
                     sheets_written = True
-        
-        # Write rows with NaN in the ID columns to separate tabs if they exist
-        if not df1_with_nan.empty:
-            df1_with_nan.to_excel(writer, sheet_name=f'{id_column1}_NaN', index=False)
-            sheets_written = True
-        if not df2_with_nan.empty:
-            df2_with_nan.to_excel(writer, sheet_name=f'{id_column2}_NaN', index=False)
-            sheets_written = True
 
         # Remove the dummy sheet if any real data was written
         if sheets_written:
