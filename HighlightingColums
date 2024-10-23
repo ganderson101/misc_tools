@@ -1,0 +1,28 @@
+import pandas as pd
+
+# Create a sample DataFrame
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6],
+    'C': [7, 8, 9]
+})
+
+# Specify the path for the Excel file
+file_path = 'highlight_columns.xlsx'
+
+# Use pandas ExcelWriter with xlsxwriter engine
+with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+    df.to_excel(writer, sheet_name='Sheet1', index=False)
+    
+    # Access the xlsxwriter workbook and worksheet objects
+    workbook  = writer.book
+    worksheet = writer.sheets['Sheet1']
+    
+    # Create a format for the highlighted column
+    highlight_format = workbook.add_format({'bg_color': 'yellow'})
+    
+    # Apply the format to specific columns (e.g., columns B and C)
+    worksheet.set_column('B:B', None, highlight_format)
+    worksheet.set_column('C:C', None, highlight_format)
+
+print(f"Excel file saved as {file_path}")
