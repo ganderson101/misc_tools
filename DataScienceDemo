@@ -1,0 +1,154 @@
+import pandas as pd
+import numpy as np
+
+class DataScienceHelper:
+    
+    def __init__(self):
+        # Default dataframes for demonstration
+        data1 = {
+            'A': np.random.randint(1, 100, 20),
+            'B': np.random.choice(['X', 'Y', 'Z'], 20),
+            'C': np.random.randn(20),
+            'D': pd.date_range('20230101', periods=20),
+            'E': np.random.choice([True, False], 20)
+        }
+        
+        data2 = {
+            'A': np.random.randint(1, 100, 20),
+            'F': np.random.choice(['G', 'H', 'I'], 20),
+            'G': np.random.randn(20),
+            'H': pd.date_range('20230101', periods=20),
+            'I': np.random.choice([True, False], 20)
+        }
+        
+        self.df1 = pd.DataFrame(data1)
+        self.df2 = pd.DataFrame(data2)
+    
+    # Method 1: Read a CSV file
+    def read_csv(self, filepath):
+        return pd.read_csv(filepath)
+
+    # Method 2: Write to a CSV file
+    def write_csv(self, df, filepath):
+        df.to_csv(filepath, index=False)
+
+    # Method 3: Display first few rows of a dataframe
+    def head(self, df, n=5):
+        return df.head(n)
+
+    # Method 4: Display last few rows of a dataframe
+    def tail(self, df, n=5):
+        return df.tail(n)
+
+    # Method 5: Get summary statistics of a dataframe
+    def describe(self, df):
+        return df.describe()
+
+    # Method 6: Filter rows based on condition
+    def filter_rows(self, df, condition):
+        return df[condition]
+
+    # Method 7: Merge two dataframes on a column
+    def merge(self, df1, df2, on_column, how='inner'):
+        return pd.merge(df1, df2, on=on_column, how=how)
+
+    # Method 8: Group data by a column and aggregate
+    def groupby_aggregate(self, df, group_column, agg_column, agg_func):
+        return df.groupby(group_column)[agg_column].agg(agg_func)
+
+    # Method 9: Sort values by a column
+    def sort_values(self, df, by_column, ascending=True):
+        return df.sort_values(by=by_column, ascending=ascending)
+
+    # Method 10: Drop columns from a dataframe
+    def drop_columns(self, df, columns):
+        return df.drop(columns=columns)
+
+    # Method 11: Rename columns in a dataframe
+    def rename_columns(self, df, columns_dict):
+        return df.rename(columns=columns_dict)
+
+    # Method 12: Fill missing values
+    def fill_missing(self, df, value):
+        return df.fillna(value)
+
+    # Method 13: Check for missing values
+    def check_missing(self, df):
+        return df.isnull().sum()
+
+    # Method 14: Create a new column based on existing columns
+    def create_new_column(self, df, new_column_name, operation):
+        df[new_column_name] = operation(df)
+        return df
+
+    # Method 15: Pivot a dataframe
+    def pivot_table(self, df, values, index, columns, aggfunc='mean'):
+        return pd.pivot_table(df, values=values, index=index, columns=columns, aggfunc=aggfunc)
+
+    # Method 16: Remove duplicates
+    def drop_duplicates(self, df):
+        return df.drop_duplicates()
+
+    # Method 17: Concatenate two dataframes
+    def concat(self, df1, df2, axis=0):
+        return pd.concat([df1, df2], axis=axis)
+
+    # Method 18: Apply a function to a dataframe column
+    def apply_function(self, df, column, func):
+        df[column] = df[column].apply(func)
+        return df
+
+    # Method 19: Get unique values from a column
+    def unique_values(self, df, column):
+        return df[column].unique()
+
+    # Method 20: Get the shape of a dataframe
+    def get_shape(self, df):
+        return df.shape
+
+    # Method 21: Sample random rows from dataframe
+    def sample_rows(self, df, n=5):
+        return df.sample(n)
+
+    # Method 22: Create dummy variables
+    def create_dummies(self, df, column):
+        return pd.get_dummies(df, columns=[column])
+
+    # Method 23: Apply a rolling window function
+    def rolling_window(self, df, column, window_size, func):
+        return df[column].rolling(window=window_size).apply(func)
+
+    # Method 24: Add a constant to a column
+    def add_constant(self, df, column, value):
+        df[column] = df[column] + value
+        return df
+
+    # Method 25: Reset index of a dataframe
+    def reset_index(self, df):
+        return df.reset_index(drop=True)
+
+    # Method 26: Set a column as index
+    def set_index(self, df, column):
+        return df.set_index(column)
+
+    # Method 27: Transpose a dataframe
+    def transpose(self, df):
+        return df.T
+
+    # Method 28: Filter columns based on column names
+    def filter_columns(self, df, columns):
+        return df[columns]
+
+    # Method 29: Drop rows with missing values
+    def drop_na(self, df):
+        return df.dropna()
+
+    # Method 30: Convert a column to datetime
+    def convert_to_datetime(self, df, column):
+        df[column] = pd.to_datetime(df[column])
+        return df
+
+# Example usage
+ds_helper = DataScienceHelper()
+print(ds_helper.head(ds_helper.df1))
+print(ds_helper.merge(ds_helper.df1, ds_helper.df2, on_column='A'))
