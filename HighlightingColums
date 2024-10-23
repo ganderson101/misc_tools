@@ -194,3 +194,54 @@ with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
     worksheet.freeze_panes(1, 0)  # Freezes the first row (0-based indexing, so row 1 is actually the second)
 
 print(f"Excel file saved as {file_path}")
+import pandas as pd
+
+# Create a sample DataFrame with columns named 1 to 50
+df = pd.DataFrame({
+    i: range(1, 4) for i in range(1, 51)  # Creating 50 columns
+})
+
+# Specify the path for the Excel file
+file_path = 'highlight_columns_with_filter_and_freeze_pane_any_columns.xlsx'
+
+# Use pandas ExcelWriter with xlsxwriter engine
+with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+    df.to_excel(writer, sheet_name='Sheet1', index=False)
+    
+    # Access the xlsxwriter workbook and worksheet objects
+    workbook  = writer.book
+    worksheet = writer.sheets['Sheet1']
+    
+    # Create a format for the highlighted columns
+    highlight_format = workbook.add_format({'bg_color': 'yellow'})
+    
+    # Get the column headers from the DataFrame
+    headers = df.columns.tolist()
+
+    # Define the columns to highlight by their names
+    columns_to_highlight = [48, 37]  # Columns you want to highlight
+    
+    # Function to convert column index to Excel letter format (supports > 26 columns)
+    def excel_column_letter(col_idx):
+        col_idx += 1  # Excel is 1-based indexing, adjust from 0-based Python indexing
+        letters = ''
+        while col_idx > 0:
+            col_idx, remainder = divmod(col_idx - 1, 26)
+            letters = chr(65 + remainder) + letters
+        return letters
+
+    # Apply formatting to specific columns based on headers
+    for header in headers:
+        if header in columns_to_highlight:
+            col_idx = headers.index(header)
+            excel_col = excel_column_letter(col_idx)
+            worksheet.set_column(f'{excel_col}:{excel_col}', None, highlight_format)
+    
+    # Apply filter to the entire data range
+    last_column_letter = excel_column_letter(len(headers) - 1)
+    worksheet.autofilter(f'A1:{last_column_letter}{len(df) + 1}')  # Apply filter across all columns
+
+    # Add freeze pane to freeze the first row
+    worksheet.freeze_panes(1, 0)  # Freezes the first row (0-based indexing)
+
+print(f"Excel file saved as {file_path}")
