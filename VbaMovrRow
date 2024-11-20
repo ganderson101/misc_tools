@@ -1,0 +1,57 @@
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+    ' Enable keyboard shortcuts for moving rows
+    Application.OnKey "%{UP}", "MoveRowUp"
+    Application.OnKey "%{DOWN}", "MoveRowDown"
+End Sub
+
+Private Sub Worksheet_Deactivate()
+    ' Disable the keyboard shortcuts when the worksheet is deactivated
+    Application.OnKey "%{UP}"
+    Application.OnKey "%{DOWN}"
+End Sub
+
+Sub MoveRowUp()
+    Dim rng As Range
+    Dim currentRow As Long
+    Dim ws As Worksheet
+    
+    Set ws = ActiveSheet
+    currentRow = Selection.Row
+    
+    ' Exit if already on the first row
+    If currentRow = 1 Then Exit Sub
+    
+    Application.ScreenUpdating = False
+    ws.Rows(currentRow).Cut
+    ws.Rows(currentRow - 1).Insert Shift:=xlDown
+    Application.CutCopyMode = False
+    ws.Rows(currentRow).Delete Shift:=xlUp
+    Application.ScreenUpdating = True
+    
+    ' Re-select the moved row
+    ws.Cells(currentRow - 1, Selection.Column).Select
+End Sub
+
+Sub MoveRowDown()
+    Dim rng As Range
+    Dim currentRow As Long
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    
+    Set ws = ActiveSheet
+    currentRow = Selection.Row
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    
+    ' Exit if already on the last row
+    If currentRow = lastRow Then Exit Sub
+    
+    Application.ScreenUpdating = False
+    ws.Rows(currentRow).Cut
+    ws.Rows(currentRow + 1).Insert Shift:=xlDown
+    Application.CutCopyMode = False
+    ws.Rows(currentRow).Delete Shift:=xlUp
+    Application.ScreenUpdating = True
+    
+    ' Re-select the moved row
+    ws.Cells(currentRow + 1, Selection.Column).Select
+End Sub
